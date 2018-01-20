@@ -1,0 +1,11 @@
+#!/bin/bash
+
+apt-get install software-properties-common -y
+add-apt-repository ppa:max-c-lv/shadowsocks-libev -y
+apt-get update
+apt install shadowsocks-libev
+
+# disable service
+systemctl disable shadowsocks-libev.service
+# add user, so that we can filter the traffic base on user
+useradd ss

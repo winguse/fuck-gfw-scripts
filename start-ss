@@ -1,0 +1,15 @@
+#!/bin/bash
+
+
+server=new-york
+
+if [ "$1" != "" ];
+then
+	server=$1;
+fi
+
+
+echo Change user to ss ...
+
+sudo ss-redir -a ss -v -c ~/.config/scripts/ss-configs/$server.json
+

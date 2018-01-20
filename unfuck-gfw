@@ -1,0 +1,27 @@
+#!/bin/bash
+
+iptables -t nat -D OUTPUT -p udp --destination-port 53 ! --destination 127.0.1.1 -j DNAT --to-destination 208.67.222.222:443
+
+iptables -t nat -D OUTPUT -p tcp -j SS-TCP
+
+# for ss
+iptables -t nat -D SS-TCP -m owner --uid-owner ss -j RETURN
+# private networks
+iptables -t nat -D SS-TCP -d 0/8 -j RETURN
+iptables -t nat -D SS-TCP -d 127/8 -j RETURN
+iptables -t nat -D SS-TCP -d 10/8 -j RETURN
+iptables -t nat -D SS-TCP -d 169.254/16 -j RETURN
+iptables -t nat -D SS-TCP -d 172.16/12 -j RETURN
+iptables -t nat -D SS-TCP -d 192.168/16 -j RETURN
+iptables -t nat -D SS-TCP -d 224/4 -j RETURN
+iptables -t nat -D SS-TCP -d 240/4 -j RETURN
+
+iptables -t nat -D SS-TCP -m set --match-set chnip dst -j RETURN
+
+iptables -t nat -D SS-TCP -p tcp -j REDIRECT --to-ports 1081
+
+iptables -t nat -X SS-TCP
+
+
+ipset destroy chnip
+

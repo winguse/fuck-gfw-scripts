@@ -1,0 +1,42 @@
+#!/bin/bash
+
+
+# range for China IPs
+
+curl -sL http://f.ip.cn/rt/chnroutes.txt | egrep -v '^\s*$|^\s*#' > chnip.txt
+ipset -N chnip hash:net
+for i in `cat chnip.txt`; do
+  ipset -A chnip $i
+done
+rm chnip.txt
+
+
+iptables -t nat -N SS-TCP
+
+# for ss traffic
+iptables -t nat -A SS-TCP -m owner --uid-owner ss -j RETURN
+# private networks
+iptables -t nat -A SS-TCP -d 0/8 -j RETURN
+iptables -t nat -A SS-TCP -d 127/8 -j RETURN
+iptables -t nat -A SS-TCP -d 10/8 -j RETURN
+iptables -t nat -A SS-TCP -d 169.254/16 -j RETURN
+iptables -t nat -A SS-TCP -d 172.16/12 -j RETURN
+iptables -t nat -A SS-TCP -d 192.168/16 -j RETURN
+iptables -t nat -A SS-TCP -d 224/4 -j RETURN
+iptables -t nat -A SS-TCP -d 240/4 -j RETURN
+
+
+# China Ips
+iptables -t nat -A SS-TCP -m set --match-set chnip dst -j RETURN
+
+# finally redirect to SS
+iptables -t nat -A SS-TCP -p tcp -j REDIRECT --to-ports 1081
+
+# add all OUTPUT to SS-TCP chain
+iptables -t nat -A OUTPUT -p tcp -j SS-TCP
+
+# use Open DNS
+iptables -t nat -A OUTPUT -p udp --destination-port 53 ! --destination 127.0.1.1 -j DNAT --to-destination 208.67.222.222:443
+
+
+

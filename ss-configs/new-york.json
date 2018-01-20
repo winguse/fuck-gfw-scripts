@@ -1,0 +1,7 @@
+{
+	"method": "aes-128-cfb",
+	"password": "YOUR_PASSWORD",
+	"server": "YOUR_SERVER_ADDR",
+	"server_port": 12345,
+	"local_port": 1081
+}
