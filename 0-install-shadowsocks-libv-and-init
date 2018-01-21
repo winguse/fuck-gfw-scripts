@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/sudo /bin/bash
 
 apt-get install software-properties-common -y
 add-apt-repository ppa:max-c-lv/shadowsocks-libev -y
